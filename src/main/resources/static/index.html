@@ -543,9 +543,25 @@
       if (!isValidPassword(password)) {
         return;
       }
+      let data = {
+        "password" : password
+      }
+      $.ajax({
+        type: "DELETE",
+        url: `/api/Memos/${id}`,
+        contentType : "application/json",
+        data : JSON.stringify(data),
+        success: function (response) {
+          alert('메시지 삭제에 성공하였습니다.');
+        }, error(xhr, status, error) {
+          alert('패스워드가 틀림니다.');
+        }, complete(xhr, status) {
+          window.location.reload();
+        }
+      });
 
       // 3. DELETE /api/memos/{id} 에 요청해서 메모를 삭제합니다.
-      $.ajax({
+      /*$.ajax({
         type: "DELETE",
         url: `/api/Memos/${id}/${password}`,
         success: function (response) {
@@ -555,8 +571,7 @@
         }, complete(xhr, status) {
           window.location.reload();
         }
-      })
-
+      });*/
     }
 
   </script>

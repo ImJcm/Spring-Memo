@@ -53,26 +53,28 @@ public class MemoService {
         해결하였다.
      */
     @Transactional
-    public Long updateMemo(Long id, MemoRequestDto memoRequestDto) {
+    public MemoResponseDto updateMemo(Long id, MemoRequestDto memoRequestDto) {
         Memo memo = findMemo(id);
 
         /* 패스워드 검증 */
         if (checkPassword(memo.getPassword(), memoRequestDto.getPassword())) {
             memo.update(memoRequestDto);
-            return id;
+            return new MemoResponseDto(memo);
+            //return id;
         } else {
             throw new IllegalArgumentException("비밀번호가 틀립니다.");
         }
     }
 
     @Transactional
-    public Long deleteMemo(Long id, String password) {
+    public String deleteMemo(Long id, String password) {
         Memo memo = findMemo(id);
 
         /* 패스워드 검증 */
         if (checkPassword(memo.getPassword(), password)) {
             memoRepository.delete(memo);
-            return id;
+            //return id;
+            return "{\"success\":\"true\"}";
         } else {
             throw new IllegalArgumentException("비밀번호가 틀립니다.");
         }

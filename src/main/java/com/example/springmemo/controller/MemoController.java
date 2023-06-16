@@ -2,6 +2,7 @@ package com.example.springmemo.controller;
 
 import com.example.springmemo.dto.MemoRequestDto;
 import com.example.springmemo.dto.MemoResponseDto;
+import com.example.springmemo.entity.Memo;
 import com.example.springmemo.service.MemoService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/api")
@@ -68,16 +70,23 @@ public class MemoController {
      */
     @PutMapping("/Memos/{id}")
     @ResponseBody
-    public Long updateMemo(@PathVariable Long id, @RequestBody MemoRequestDto memoRequestDto) {
+    public MemoResponseDto updateMemo(@PathVariable Long id, @RequestBody MemoRequestDto memoRequestDto) {
         return memoService.updateMemo(id,memoRequestDto);
     }
 
     /*
         메모 삭제
      */
-    @DeleteMapping("/Memos/{id}/{password}")
+    @DeleteMapping("/Memos/{id}")
+    @ResponseBody
+    public String deleteMemo(@PathVariable Long id, @RequestBody Map<String,String> map) {
+        return memoService.deleteMemo(id,map.get("password"));
+    }
+    //@ReqeustBody를 사용하면 무조건 JSON형태의 객체로 변환하는것 인줄만 알았는데 객체 변수 중 일부만
+    //받아오는 경우, Map<>을 사용해서 처리하면 될 것같다.
+    /*@DeleteMapping("/Memos/{id}/{password}")
     @ResponseBody
     public Long deleteMemo(@PathVariable Long id, @PathVariable String password) {
         return memoService.deleteMemo(id,password);
-    }
+    }*/
 }
