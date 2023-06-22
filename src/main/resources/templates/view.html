@@ -20,10 +20,6 @@
       margin: 10px auto;
     }
 
-    #contents {
-      width: 538px;
-    }
-
     .print-area {
       position: relative;
       width: 538px;
@@ -40,8 +36,7 @@
       font-size: 20px;
     }
 
-    .print-area img {
-      float: right;
+    .header img {
       width: 30px;
       margin-top: 6px;
       margin-right: 10px;
@@ -105,20 +100,8 @@
       border: none;
       padding: 18px;
       resize: none;
-    }
-
-    textarea.field::placeholder {
-      width: 216px;
-      height: 16px;
-      font-family: 'Noto Sans KR', sans-serif;
-      font-size: 16px;
-      font-weight: normal;
-      font-stretch: normal;
-      font-style: normal;
-      line-height: 1;
-      letter-spacing: -0.96px;
-      text-align: left;
-      color: #868e96;
+      font-family: 'Spoqa Han Sans';
+      color: #646c74;
     }
 
     textarea.field2 {
@@ -130,34 +113,141 @@
       margin-bottom: 5px;
       padding: 5px;
       resize: none;
+      font-family: 'Spoqa Han Sans';
+      color: #646c74;
     }
 
-    textarea.field2::placeholder {
-      width: 216px;
-      height: 20px;
-      font-family: 'Noto Sans KR', sans-serif;
-      font-size: 16px;
-      font-weight: normal;
-      font-stretch: normal;
-      font-style: normal;
-      line-height: 1;
-      letter-spacing: -0.96px;
-      text-align: left;
-      padding-left: 10px;
-      color: #868e96;
+    .contents {
+      word-wrap: break-word;
+      word-break: break-all;
     }
 
+    .footer {
+      position: relative;
+      height: 40px;
+    }
+
+    .footer img.icon-start-edit {
+      cursor: pointer;
+      position: absolute;
+      bottom: 14px;
+      right: 55px;
+      width: 18px;
+      height: 18px;
+    }
+
+    .footer img.icon-end-edit {
+      cursor: pointer;
+      position: absolute;
+      display: none;
+      bottom: 14px;
+      right: 55px;
+      width: 20px;
+      height: 15px;
+    }
+
+    .footer img.icon-delete {
+      cursor: pointer;
+      position: absolute;
+      bottom: 12px;
+      right: 19px;
+      width: 14px;
+      height: 18px;
+    }
   </style>
   <script>
     $(document).ready(function () {
-      const urlParams = new URL(location.href).searchParams;
-      id = urlParams.get('id');
 
-      printInfo(id);
     });
 
-    function printInfo(id) {
+    //입력한 제목이 올바른지 검사
+    function isValidTitle(title) {
+      if (title.length > 0) {
+        return true;
+      }
+      alert("제목을 입력해주세요.");
+      return false;
+    }
 
+    // 사용자가 내용을 올바르게 입력하였는지 확인합니다.
+    function isValidContents(contents) {
+      if (contents == '') {
+        alert('내용을 입력해주세요');
+        return false;
+      }
+      if (contents.trim().length > 140) {
+        alert('공백 포함 140자 이하로 입력해주세요');
+        return false;
+      }
+      return true;
+    }
+
+    // 수정 버튼을 눌렀을 때, 숨길 버튼을 숨기고, 나타낼 버튼을 나타냅니다.
+    function showEdits() {
+      $(`#submit`).show();
+      $(`#delete`).show();
+      $(`#edit`).hide();
+
+      $(`#title`).attr('readonly',false);
+      $(`#content`).attr('readonly',false);
+
+      $(`#title`).css('color',"black");
+      $(`#content`).css('color',"black");
+    }
+
+    // 메모를 수정합니다.
+    function submitEdit(id) {
+      // 1. 작성 대상 메모의 title, username, contents 를 확인합니다.
+      let title = $(`#title`).val().trim();
+      let contents = $(`#content`).val().trim();
+
+      // 2. 작성한 메모의 제목이 올바른지 검사
+      if(isValidTitle(title) == false) {
+        return;
+      }
+
+      // 3. 작성한 메모가 올바른지 isValidContents 함수를 통해 확인합니다.
+      if (isValidContents(contents) == false) {
+        return;
+      }
+
+      // 4. 전달할 data JSON으로 만듭니다.
+      let data = {
+        'title': title,
+        'contents': contents,
+      };
+
+      // 5. PUT /api/memos/{id} 에 data를 전달합니다.
+      $.ajax({
+        type: "PUT",
+        url: `/api/Memo/${id}`,
+        contentType: "application/json",
+        data: JSON.stringify(data),
+        success: function (response) {
+          alert("메모가 수정되었습니다.")
+        }, error: function(req,status,error) {
+          alert("메모의 작성자가 아닙니다.");
+        }, complete: function(xhr, status) {
+          window.location.reload();
+        }
+      });
+    }
+
+    // 메모를 삭제합니다.
+    function deleteOne(id) {
+      // 1. DELETE /api/memo/{id} 에 요청해서 메모를 삭제합니다.
+      $.ajax({
+        type: "DELETE",
+        url: `/api/Memo/${id}`,
+        success: function (response) {
+          const json = JSON.parse(response)
+          alert(json.msg);
+          window.location.href = '/';
+        }, error(xhr, status, error) {
+          alert('메모의 작성자가 아닙니다.');
+          window.location.reload();
+        },
+      })
     }
 
   </script>
@@ -167,19 +257,24 @@
   <div class="background-body"></div>
   <div class="wrap">
     <div class="header">
+      <img src="/images/back.png" style="color:white" onclick="location.href='/'">
       <h2>Memo Detail</h2>
-      <!--<p th:text="${result}">
-      </p>-->
     </div>
     <div class="print-area">
       <textarea readonly class="field2" th:text ="${result.getTitle()}" id="title" maxlength="20"></textarea>
       <textarea readonly class="field2" th:text ="${result.getUsername()}" id="username" maxlength="15"></textarea>
       <textarea readonly class="field2" th:text ="${result.getCreatedAt()}" id="createdAt" max="15"></textarea>
       <textarea readonly class="field2" th:text ="${result.getModifiedAt()}" id="modifiedAt" max="15"></textarea>
-      <textarea readonly class="field"  th:text ="${result.getContents()}" id="contents" cols="30" rows="10"></textarea>
-      <img src="/static/images/back.png" onclick="location.href='/';">
+      <div class="contents">
+        <textarea readonly id="content" class="field" th:text="${result.getContents()}" cols="30" rows="5"></textarea>
+        <div class="footer">
+          <img id="edit" class="icon-start-edit" src="/images/edit.png" alt="" onclick="showEdits()">
+          <img id="delete" class="icon-delete" src="/images/delete.png" alt="" th:memoid="${result.getId()}" onclick="deleteOne(this.getAttribute('memoid'))">
+          <img id="submit" class="icon-end-edit" src="/images/done.png" alt="" th:memoid="${result.getId()}" onclick="submitEdit(this.getAttribute('memoid'))">
+        </div>
+      </div>
     </div>
-
+    <!-- Comment 영역 -->
   </div>
 </body>
 

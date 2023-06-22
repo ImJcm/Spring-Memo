@@ -2,15 +2,14 @@ package com.example.springmemo.controller;
 
 import com.example.springmemo.dto.MemoRequestDto;
 import com.example.springmemo.dto.MemoResponseDto;
-import com.example.springmemo.entity.Memo;
+import com.example.springmemo.security.UserDetailsImpl;
 import com.example.springmemo.service.MemoService;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
-import java.util.Map;
 
 @Controller
 @RequestMapping("/api")
@@ -40,53 +39,46 @@ public class MemoController {
     /*
         선택 메모 조회
      */
-    /*@GetMapping("/Memos/{id}")
-    public String getMemo(@PathVariable Long id) {
-        return "view";
-    }*/
-    @GetMapping("/Memos/{id}")
+    @GetMapping("/Memo/{id}")
     public String getMemo(@PathVariable Long id,Model model) {
         model.addAttribute("result", memoService.getMemo(id));
         return "view";
     }
 
-    /*@GetMapping("/Memos/view")
-    public String getView(Model model) {
-        model.addAttribute("responseDto",)
-        return "view";
-    }*/
-
     /*
         메모 작성
+        메모 작성 시, title, contents만 JSON데이터로 넘어오고, JWT Token에서 username 정보를 가져온다.
      */
-    @PostMapping("/Memos")
+    @PostMapping("/Memo")
     @ResponseBody
-    public MemoResponseDto createMemo(@RequestBody MemoRequestDto memoRequestDto) {
-        return memoService.createMemo(memoRequestDto);
+    public MemoResponseDto createMemo(@RequestBody MemoRequestDto memoRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return memoService.createMemo(memoRequestDto, userDetails);
     }
 
     /*
         메모 수정
+        @PathVariable로 id를 받고, title,contets는 @RequestBody:Json, username은 @AuthenticationPrincipal로 JWT토큰으로 받는다.
      */
-    @PutMapping("/Memos/{id}")
+    @PutMapping("/Memo/{id}")
     @ResponseBody
-    public MemoResponseDto updateMemo(@PathVariable Long id, @RequestBody MemoRequestDto memoRequestDto) {
-        return memoService.updateMemo(id,memoRequestDto);
+    public MemoResponseDto updateMemo(@PathVariable Long id, @RequestBody MemoRequestDto memoRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return memoService.updateMemo(id,memoRequestDto,userDetails);
     }
 
     /*
         메모 삭제
+        기존의 패스워드 비교방식이 아닌 JWT 토큰에서 username을 비교한다.
      */
-    @DeleteMapping("/Memos/{id}")
+    @DeleteMapping("/Memo/{id}")
+    @ResponseBody
+    public String deleteMemo(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return memoService.deleteMemo(id, userDetails);
+    }
+    /*
+    @DeleteMapping("/Memo/{id}")
     @ResponseBody
     public String deleteMemo(@PathVariable Long id, @RequestBody Map<String,String> map) {
         return memoService.deleteMemo(id,map.get("password"));
     }
-    //@ReqeustBody를 사용하면 무조건 JSON형태의 객체로 변환하는것 인줄만 알았는데 객체 변수 중 일부만
-    //받아오는 경우, Map<>을 사용해서 처리하면 될 것같다.
-    /*@DeleteMapping("/Memos/{id}/{password}")
-    @ResponseBody
-    public Long deleteMemo(@PathVariable Long id, @PathVariable String password) {
-        return memoService.deleteMemo(id,password);
-    }*/
+     */
 }

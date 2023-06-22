@@ -11,7 +11,6 @@ public class MemoResponseDto {
     private String title;
     private String username;
     private String contents;
-    private String password;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
     public MemoResponseDto(Memo memo) {
@@ -19,7 +18,6 @@ public class MemoResponseDto {
         this.title = memo.getTitle();
         this.username = memo.getUsername();
         this.contents = memo.getContents();
-        this.password = memo.getPassword();
         this.createdAt = memo.getCreatedAt();
         this.modifiedAt = memo.getModifiedAt();
     }

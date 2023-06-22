@@ -9,14 +9,15 @@ import lombok.Setter;
 @Entity
 @Getter
 @Setter
-@Table(name="memoproject")
+@Table(name="memoproject")  //객체를 DB와 Mapping, Table 지정
 @NoArgsConstructor
 public class Memo extends Timestamped {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
+    @Id //고유 primary key
+    @GeneratedValue(strategy = GenerationType.IDENTITY) //테이블 값 생성 시, 자동으로 id 증가 = auto increment
     private Long id;
 
-    @Column(name = "title", nullable = false)
+    @Column(name = "title", nullable = false)   //테이블 필드 = column
     private String title;
 
     @Column(name = "username", nullable = false)
@@ -25,20 +26,15 @@ public class Memo extends Timestamped {
     @Column(name = "contents", nullable = false)
     private String contents;
 
-    @Column(name = "password", nullable = false)
-    private String password;
-
     public Memo(MemoRequestDto memoRequestDto) {
         this.title = memoRequestDto.getTitle();
         this.username = memoRequestDto.getUsername();
         this.contents = memoRequestDto.getContents();
-        this.password = memoRequestDto.getPassword();
     }
 
     public void update(MemoRequestDto memoRequestDto) {
         this.title = memoRequestDto.getTitle();
         this.username = memoRequestDto.getUsername();
         this.contents = memoRequestDto.getContents();
-        this.password = memoRequestDto.getPassword();
     }
 }
