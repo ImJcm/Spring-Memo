@@ -1,4 +1,43 @@
 # Spring-Memo
+## 댓글 기능 + 코드 개선 ##
+
+---
+## 2023/06/22 - 회원가입 & 로그인 구현 + 코드 개선 ##
+### API 명세 ###
+![API명세](https://user-images.githubusercontent.com/51190093/247959263-da2dbe54-8c6d-4d01-9860-9c1d55ff7a24.PNG)
+### USECASE ###
+![USECASE](https://user-images.githubusercontent.com/51190093/247959278-16b4bd5d-e941-4935-b4e1-4a3cb2a5f52f.PNG)
+### 회원가입 ###
+![회원가입](https://user-images.githubusercontent.com/51190093/247956790-622b132e-537b-414d-8f83-31aa5d32e87d.PNG)
+![회원등록](https://user-images.githubusercontent.com/51190093/247956869-f5227756-4f22-4dbf-bba7-522f27ebe6b9.PNG)
+![회원중복실패](https://user-images.githubusercontent.com/51190093/247956881-1565b710-b54a-488e-8933-67540663b1e6.PNG)
+![회원중복실패2](https://user-images.githubusercontent.com/51190093/247956911-66dab81d-84a8-4a89-88df-d162f45b812b.PNG)
+
+### 로그인 ###
+![로그인](https://user-images.githubusercontent.com/51190093/247956930-dbb8b869-0ed2-4365-9bc7-ddb887ef213c.PNG)
+![jwt토큰생성](https://user-images.githubusercontent.com/51190093/247959280-a8297395-dcc7-4993-99ef-330061e323f6.PNG)
+
+### 메모 작성 ###
+![메모작성](https://user-images.githubusercontent.com/51190093/247956975-ce3578dd-c906-4899-9db7-1cf31dce1edc.PNG)
+![메모작성결과](https://user-images.githubusercontent.com/51190093/247956984-1573755c-3102-47c0-b2a8-7d1374eb738e.PNG)
+
+### 상세 메모 조회 ###
+![메모조회](https://user-images.githubusercontent.com/51190093/247957002-7acf330d-aff2-4c99-b264-ba77bd001de0.PNG)
+
+### 메모 수정 ###
+#### JWT 토큰에 저장된 USERNAME을 기준으로 메모를 수정할 권한이 주어진다. ####
+![메모수정](https://user-images.githubusercontent.com/51190093/247957022-f96604e8-cd49-4d7f-a242-39bf09b8e05f.PNG)
+![메모수정완료](https://user-images.githubusercontent.com/51190093/247957193-a57a3ced-fd75-44f4-bb57-9f7273433269.PNG)
+![수정실패](https://user-images.githubusercontent.com/51190093/247957234-f920a6c4-8742-4779-b32e-8f5154396bf8.PNG)
+
+### 메모 삭제 ###
+#### JWT 토큰에 저장된 USERNAME을 기준으로 메모의 삭제 권한이 주어진다. ####
+![메모삭제성공](https://user-images.githubusercontent.com/51190093/247957286-346cb719-8cd2-4e10-95f0-edbf092c456e.PNG)
+![메모삭제](https://user-images.githubusercontent.com/51190093/247957300-43e6f662-ba44-4d0f-9c52-39f1e7e89f44.PNG)
+![메모삭제실패](https://user-images.githubusercontent.com/51190093/247957315-81fe4df7-224c-4e5d-98de-e5d1e4781b94.PNG)
+
+---
+## 2023/06/15 - CRUD 기능 ##
 ### API 명세 ###
 ![API명세](https://user-images.githubusercontent.com/51190093/246301888-2a8dd777-8aa9-4446-9730-eaff69be1a8c.PNG)
 
