@@ -17,6 +17,10 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+/*
+ * 1. 인증설정 (WebSecurityConfig.java)
+ * WebSecurityConfig > http.formLogin() > UsernamePasswordAuthenticationFilter > SecurityFilterChain > 요청별 인증수행
+ */
 @Configuration
 @EnableWebSecurity  // Spring Security 지원
 @EnableGlobalMethodSecurity(securedEnabled = true)
@@ -86,7 +90,8 @@ public class WebSecurityConfig {
 
         // 필터 관리
         // 인증 이전에 인가를 배치하여 JWT 토큰이 있다면 인가부분에서 인증 처리한다.
-        // JwtAuthorizationFilter -> JwtAuthenticationFilter -> DispatcherServlet -> Controller -> ...
+        // JwtAuthorizationFilter -> JwtAuthenticationFilter -> UsernamePasswordAuthenticationFilter
+        // -> DispatcherServlet -> Controller -> ...
         http.addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 

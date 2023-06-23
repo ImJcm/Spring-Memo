@@ -70,7 +70,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         - UsernamePasswordAuthenticationFilter는 Spring Security의 필터인 AbstractAuthenticationProcessingFilter를 상속한 Filter입니다.
         - 기본적으로 Form Login 기반을 사용할 때 username 과 password 확인하여 인증합니다.
         - 인증 과정
-            1. 사용자가 username과 password를 제출하면 UsernamePasswordAuthenticationFilter는 인증된 사용자의 정보가 담기는 인증 객체인 Authentication의 종류 중 하나인  UsernamePasswordAuthenticationToken을 만들어 AuthenticationManager에게 넘겨 인증을 시도합니다.
+            1. 사용자가 username과 password를 제출하면 UsernamePasswordAuthenticationFilter는 인증된 사용자의 정보가 담기는
+               인증 객체인 Authentication의 종류 중 하나인 UsernamePasswordAuthenticationToken을 만들어 AuthenticationManager에게
+               넘겨 인증을 시도합니다.
             2. 실패하면 SecurityContextHolder를 비웁니다.
             3. 성공하면 SecurityContextHolder에 Authentication를 세팅합니다.
         - SecurityContext는 인증이 완료된 사용자의 상세 정보(Authentication)을 저장하고 인가시 사용된다.
@@ -87,6 +89,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     /*
         UsernamePasswordAuthenticationToken는 Authentication을 implements한 AbstractAuthenticationToken의 하위 클래스로
         인증객체를 만드는데 사용한다.
+        Authentication(Principal, Credential, Authorities)
      */
     private Authentication createAuthentication(String username) {
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);

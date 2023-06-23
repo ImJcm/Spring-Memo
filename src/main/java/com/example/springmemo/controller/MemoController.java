@@ -46,6 +46,10 @@ public class MemoController {
     }
 
     /*
+        4. 인증객체(Authentication)에서 UserDetails 값 받아오기 (@AuthenticationPrincipal)
+            Authentication > getPrincipal() > UserDetails
+     */
+    /*
         메모 작성
         메모 작성 시, title, contents만 JSON데이터로 넘어오고, JWT Token에서 username 정보를 가져온다.
      */
