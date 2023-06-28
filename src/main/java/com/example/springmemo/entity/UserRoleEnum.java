@@ -6,9 +6,15 @@ package com.example.springmemo.entity;
         "ROLE_로 시작한다.
  */
 
-public enum UserRoleEnum {
-    USER(Authority.USER);  // 사용자 권한
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+public enum UserRoleEnum {
+    USER(Authority.USER),   // 사용자 권한
+    ADMIN(Authority.ADMIN); // 관리자 권한
     private final String authority;
 
     UserRoleEnum(String authority) {
@@ -21,6 +27,6 @@ public enum UserRoleEnum {
 
     public static class Authority {
         public static final String USER = "ROLE_USER";
+        public static final String ADMIN = "ROLE_ADMIN";
     }
-
 }

@@ -5,6 +5,7 @@ import com.example.springmemo.entity.User;
 import com.example.springmemo.entity.UserRoleEnum;
 import com.example.springmemo.jwt.JwtUtil;
 import com.example.springmemo.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +24,10 @@ public class UserService {
         this.jwtUtil = jwtUtil;
     }
 
+    // ADMIN_TOKEN
+    @Value("${admin_token}")
+    private String ADMIN_TOKEN;
+
     /*
         회원가입 시, username, password로 이루어진 SignupRequestDto로 생성자가 만들어진다.
      */
@@ -39,6 +44,12 @@ public class UserService {
 
         // 사용자 ROLE 확인
         UserRoleEnum role = UserRoleEnum.USER;
+        if (requestDto.isAdmin()) {
+            if (!ADMIN_TOKEN.equals(requestDto.getAdminToken())) {
+                throw new IllegalArgumentException("관리자 암호가 틀려 등록이 불가능합니다.");
+            }
+            role = UserRoleEnum.ADMIN;
+        }
 
         // 사용자 등록
         User user = new User(username, password, role);

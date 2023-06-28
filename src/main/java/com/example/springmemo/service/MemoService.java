@@ -7,12 +7,14 @@ import com.example.springmemo.jwt.JwtUtil;
 import com.example.springmemo.repository.MemoRepository;
 import com.example.springmemo.security.UserDetailsImpl;
 import io.jsonwebtoken.Claims;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@Slf4j(topic = "memo service")
 public class MemoService {
     /*
         @Service : Persistence Context에 의해 관리받는 Service 클래스라고 지정
@@ -30,9 +32,8 @@ public class MemoService {
         return memoRepository.findAllByOrderByCreatedAtDesc().stream().map(MemoResponseDto::new).toList();
     }
 
-    public MemoResponseDto getMemo(Long id) {
-        //return memoRepository.findById(id).map(MemoResponseDto::new).get();
-        return new MemoResponseDto(findMemo(id));
+    public MemoResponseDto getMemo(Long memoid) {
+        return new MemoResponseDto(findMemo(memoid));
     }
 
     public MemoResponseDto createMemo(MemoRequestDto memoRequestDto, UserDetailsImpl userDetails) {
@@ -53,12 +54,12 @@ public class MemoService {
        기존에 패스워드를 검증하는 방법에서 JWT 토큰의 username과 메모에 저장된 username과 비교하여 메모를 수정한다.
      */
     @Transactional
-    public MemoResponseDto updateMemo(Long id, MemoRequestDto memoRequestDto, UserDetailsImpl userDetails) {
-        Memo memo = findMemo(id);
+    public MemoResponseDto updateMemo(Long memoid, MemoRequestDto memoRequestDto, UserDetailsImpl userDetails) {
+        Memo memo = findMemo(memoid);
         memoRequestDto = updateUsernameToMemoRequestDto(memoRequestDto, userDetails.getUsername());
 
         //jwt Token username과 Memo의 username 비교 검증
-        if (checkUser(memo.getUsername(), memoRequestDto.getUsername())) {
+        if (checkUser(memo.getUsername(), memoRequestDto.getUsername()) || userDetails.getAuthoritie().equals("ROLE_ADMIN")) {
             memo.update(memoRequestDto);
             return new MemoResponseDto(memo);
         } else {
@@ -76,14 +77,16 @@ public class MemoService {
     }
 
     @Transactional
-    public String deleteMemo(Long id, UserDetailsImpl userDetails) {
-        Memo memo = findMemo(id);
+    public String deleteMemo(Long memoid, UserDetailsImpl userDetails) {
+        Memo memo = findMemo(memoid);
 
-        if (checkUser(memo.getUsername(), userDetails.getUsername())) {
+        //System.out.println(userDetails.getAuthorities().toArray()[0].equals("ROLE_ADMIN"));
+
+        if (checkUser(memo.getUsername(), userDetails.getUsername()) || userDetails.getAuthoritie().equals("ROLE_ADMIN")) {
             memoRepository.delete(memo);
             return "{\"msg\":\"게시글 삭제 성공\",\"statusCode\":\"200\"}";
         } else {
-            throw new IllegalArgumentException("비밀번호가 틀립니다.");
+            throw new IllegalArgumentException("메모의 소유자가 아닙니다.");
         }
 
         /* 패스워드 검증 */
@@ -96,8 +99,8 @@ public class MemoService {
         }*/
     }
 
-    private Memo findMemo(Long id) {
-        return memoRepository.findById(id).orElseThrow(() ->
+    private Memo findMemo(Long memoid) {
+        return memoRepository.findById(memoid).orElseThrow(() ->
                 new IllegalArgumentException("선택한 메모는 존재하지 않습니다.")
         );
     }

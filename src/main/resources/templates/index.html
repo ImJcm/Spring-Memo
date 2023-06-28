@@ -244,27 +244,27 @@
         success: function (response) {
           for (let i = 0; i < response.length; i++) {
             let message = response[i];
-            let id = message['id'];
+            let memoId = message['memoId'];
             let title = message['title'];
             let username = message['username'];
             let contents = message['contents'];
             let modifiedAt = message['modifiedAt'];
-            addHTML(id, title, username, contents, modifiedAt);
+            addHTML(memoId, title, username, contents, modifiedAt);
           }
         }
       })
     }
 
     // 메모 하나를 HTML로 만들어서 body 태그 내 원하는 곳에 붙입니다.
-    function addHTML(id, title, username, contents, modifiedAt) {
+    function addHTML(memoId, title, username, contents, modifiedAt) {
       // 1. HTML 태그를 만듭니다.
       let tempHtml = `<div class="card">
                 <!-- title/date/username 영역 -->
                 <div class="metadata">
-                    <div class="title" id="${id}-title">
+                    <div class="title" id="${memoId}-title">
                         ${title}
                     </div>
-                    <div id="${id}-username" class="username">
+                    <div id="${memoId}-username" class="username">
                         ${username}
                     </div>
                     <div class="date">
@@ -273,7 +273,7 @@
                 </div>
                 <!-- contents 조회/수정 영역-->
                 <div class="contents">
-                    <div id="${id}-contents" class="text" onclick="showMemo('${id}')">
+                    <div id="${memoId}-contents" class="text" onclick="showMemo('${memoId}')">
                         ${contents}
                     </div>
                 </div>
@@ -283,8 +283,8 @@
       $('#cards-box').append(tempHtml);
     }
 
-    function showMemo(id) {
-      return location.href = "/api/Memo/" + `${id}`;
+    function showMemo(memoId) {
+      return location.href = "/api/Memo/" + `${memoId}`;
     }
 
     // 메모를 생성합니다.

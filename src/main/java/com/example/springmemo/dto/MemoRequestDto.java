@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class MemoRequestDto {
-    private Long id;
+    private Long memoId;
     private String title;
     private String username;
     private String contents;

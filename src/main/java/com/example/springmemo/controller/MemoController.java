@@ -39,9 +39,9 @@ public class MemoController {
     /*
         선택 메모 조회
      */
-    @GetMapping("/Memo/{id}")
-    public String getMemo(@PathVariable Long id,Model model) {
-        model.addAttribute("result", memoService.getMemo(id));
+    @GetMapping("/Memo/{memoId}")
+    public String getMemo(@PathVariable Long memoId,Model model) {
+        model.addAttribute("result", memoService.getMemo(memoId));
         return "view";
     }
 
@@ -63,20 +63,20 @@ public class MemoController {
         메모 수정
         @PathVariable로 id를 받고, title,contets는 @RequestBody:Json, username은 @AuthenticationPrincipal로 JWT토큰으로 받는다.
      */
-    @PutMapping("/Memo/{id}")
+    @PutMapping("/Memo/{memoId}")
     @ResponseBody
-    public MemoResponseDto updateMemo(@PathVariable Long id, @RequestBody MemoRequestDto memoRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return memoService.updateMemo(id,memoRequestDto,userDetails);
+    public MemoResponseDto updateMemo(@PathVariable Long memoId, @RequestBody MemoRequestDto memoRequestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return memoService.updateMemo(memoId,memoRequestDto,userDetails);
     }
 
     /*
         메모 삭제
         기존의 패스워드 비교방식이 아닌 JWT 토큰에서 username을 비교한다.
      */
-    @DeleteMapping("/Memo/{id}")
+    @DeleteMapping("/Memo/{memoId}")
     @ResponseBody
-    public String deleteMemo(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return memoService.deleteMemo(id, userDetails);
+    public String deleteMemo(@PathVariable Long memoId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return memoService.deleteMemo(memoId, userDetails);
     }
     /*
     @DeleteMapping("/Memo/{id}")

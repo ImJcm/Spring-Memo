@@ -76,8 +76,10 @@ public class WebSecurityConfig {
             authorizeHttpRequests
                     .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll() // resource 접근 허용
                     .requestMatchers("/api/user/**").permitAll()    //'/api/user/'로 시작하는 요청 모두 허용
-                    .requestMatchers("/api/Memos/").permitAll()   //'/api/Memos/'로 시작하는 요청 모두 허용 = 전체 게시글 조회
-                    .requestMatchers("/api/Memo/**", HttpMethod.GET.name()).permitAll()   //'/api/Memo로 시작하는 GET 요청 모두 허용 = 게시글 선택 조회
+                    //.requestMatchers("/api/Memos/").permitAll()   //'/api/Memos/'로 시작하는 요청 모두 허용 = 전체 게시글 조회
+                    //.requestMatchers("/api/Memo/**", HttpMethod.GET.name()).permitAll()   //'/api/Memo로 시작하는 GET 요청 모두 허용 = 게시글 선택 조회
+                    //.requestMatchers("/api/Comments/**").permitAll()  //'/api/Comments/로 시작하는 GET요청 모두 허용 = 게시글의 모든 댓글 조회
+                    //.requestMatchers("/api/Comment/**").permitAll()
                     .anyRequest().authenticated();  // 그 외 모든 요청 인증 과정 거침
         });
 

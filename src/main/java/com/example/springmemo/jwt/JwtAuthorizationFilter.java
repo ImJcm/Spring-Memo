@@ -47,7 +47,11 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             //문제가 발생한 부분을 재요청할 것같다.
             //JWT 토큰의 유효성 검사
             if (!jwtUtil.validateToken(tokenValue)) {
-                log.error("Token Error");
+                //log.error("Token Error");
+
+                res.setStatus(400);
+                //res.sendError(400,"토큰이 유효하지않습니다.");
+                //res.sendError(HttpServletResponse.SC_BAD_REQUEST,"토큰이 유효하지 않습니다.");
                 return;
             }
 

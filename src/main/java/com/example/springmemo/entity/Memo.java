@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -15,7 +18,7 @@ public class Memo extends Timestamped {
 
     @Id //고유 primary key
     @GeneratedValue(strategy = GenerationType.IDENTITY) //테이블 값 생성 시, 자동으로 id 증가 = auto increment
-    private Long id;
+    private Long memoId;
 
     @Column(name = "title", nullable = false)   //테이블 필드 = column
     private String title;
@@ -25,6 +28,13 @@ public class Memo extends Timestamped {
 
     @Column(name = "contents", nullable = false)
     private String contents;
+
+    @ManyToOne
+    @JoinColumn(name="user_id")
+    private User user;
+
+    @OneToMany(mappedBy = "memo")
+    private List<Comment> commentList = new ArrayList<>();
 
     public Memo(MemoRequestDto memoRequestDto) {
         this.title = memoRequestDto.getTitle();

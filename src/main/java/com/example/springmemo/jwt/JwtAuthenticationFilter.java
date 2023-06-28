@@ -63,10 +63,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         jwtUtil.addJwtToCookie(token, response);
     }
 
-    //인증 실패 시, responseStatus : 401로 지정 후, 종료
+    //인증 실패 시, responseStatus : 400로 지정 후, 종료
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
         log.info("로그인 실패");
-        response.setStatus(401);
+        response.setStatus(400);
     }
 }

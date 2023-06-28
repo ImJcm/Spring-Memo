@@ -13,8 +13,13 @@ public class SignupRequestDto {
     @NotBlank
     private String username;
 
-    //@Validation : 소문자, 대문자 알파벳과 숫자를 포함한 8자 이상 15자 이하의 형식 + 공백 불가
-    @Pattern(regexp = "[a-zA-Z0-9]{8,15}",message = "패스워드 형식이 옳바르지 않습니다.")
+    //@Validation : 소문자, 대문자 알파벳과 숫자, 특수문자를 포함한 8자 이상 15자 이하의 형식 + 공백 불가
+    @Pattern(regexp = "[a-zA-Z0-9[^a-z-A-Z0-9\\s]]{8,15}",message = "패스워드 형식이 옳바르지 않습니다.")
+    //@Pattern(regexp = "[\\w\\W]{8,15}]",message = "패스워드 형식이 옳바르지 않습니다.")  //위 정규식과 동일
+    //@Pattern(regexp = "[^a-z-A-Z0-9\\s]",message = "특수문자가 아닙니다") //특수문자만 해당
     @NotBlank
     private String password;
+
+    private boolean admin = false;
+    private String adminToken = "";
 }

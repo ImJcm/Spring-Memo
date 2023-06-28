@@ -48,6 +48,11 @@ public class UserDetailsImpl implements UserDetails {
         return authorities;
     }
 
+    //user의 ROLE TYPE STRING 값을 얻기위한 메서드
+    public String getAuthoritie() {
+        return user.getRole().getAuthority();
+    }
+
     @Override
     public boolean isAccountNonExpired() {
         return true;
