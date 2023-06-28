@@ -1,8 +1,33 @@
 # Spring-Memo
-## 댓글 기능 + 코드 개선 ##
+## 2023/06/29 - 댓글 기능 + 코드 개선 ##
+### API 명세서 ###
+https://app.gitbook.com/o/65TldPo6hrzFO0fO765W/s/w0bcaUUhyTjUHYfmvN8O/reference/api-reference
 ### ERD ###
+![ERD](https://user-images.githubusercontent.com/51190093/249614549-99e5f82e-5416-457c-9a43-466d1149f711.png)
+### UseCase ###
+![usercase](https://user-images.githubusercontent.com/51190093/249614541-dd31c242-23e5-4f52-9b72-da2baeaa92fe.PNG)
+### 로그인 후,초기화면 ###
+![1](https://user-images.githubusercontent.com/51190093/249617906-58fbc06e-270e-47d8-b5e9-f4503e7fb08b.PNG)
+
+### 댓글 등록 ###
+![2](https://user-images.githubusercontent.com/51190093/249617906-58fbc06e-270e-47d8-b5e9-f4503e7fb08b.PNG)
+![3](https://user-images.githubusercontent.com/51190093/249617914-fb952352-839d-43d7-b1ba-54e4f4de76cb.PNG)
+
+### 댓글 수정 ###
+![4](https://user-images.githubusercontent.com/51190093/249617916-6bbdc0c9-df48-4d46-ba57-2aa7b446deae.PNG)
+![5](https://user-images.githubusercontent.com/51190093/249617921-65179a00-bfb5-4d77-a541-47bf92b7b926.PNG)
+
+### 댓글 삭제 ###
+#### 쓰레기통 버튼 클릭 시, 현재 접속한 Username과 Comment작성 username을 비교하여 삭제 여부를 결정 ####
+
+### Casecade.ALL & orphanRemoval=true ###
+#### 부모 엔티티와 자식 엔티티의 생명주기를 동일하게 설정 ####
+![6](https://user-images.githubusercontent.com/51190093/249617923-330a0536-57d1-4649-bf48-0f9740d21b95.PNG)
+#### 부모 엔티티 삭제 시, 자식 엔티티 모두 삭제되는 것을 볼 수 있다. ####
+![7](https://user-images.githubusercontent.com/51190093/249617926-345cc88a-0067-4841-900b-7d1ea50a0872.PNG)
 
 ---
+
 ## 2023/06/22 - 회원가입 & 로그인 구현 + 코드 개선 ##
 ### API 명세 ###
 ![API명세](https://user-images.githubusercontent.com/51190093/247959263-da2dbe54-8c6d-4d01-9860-9c1d55ff7a24.PNG)
