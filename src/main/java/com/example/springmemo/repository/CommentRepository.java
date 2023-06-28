@@ -7,7 +7,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
-    List<Comment> findAllByMemoIdOrderByCreatedAtDesc(Long memoId);
+    //List<Comment> findAllByMemoIdOrderByCreatedAtDesc(Long memoId);
+    List<Comment> findAllByMemo_MemoIdOrderByCreatedAtDesc(Long memoId);
 
-    Optional<Comment> findByMemoIdAndCommentId(Long memoId, Long commentId);
+    //Optional<Comment> findByMemoIdAndCommentId(Long memoId, Long commentId);
+    Optional<Comment> findByMemo_MemoIdAndCommentId(Long memoId, Long commentId);
 }

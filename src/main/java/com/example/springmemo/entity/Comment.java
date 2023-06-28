@@ -16,11 +16,11 @@ public class Comment extends Timestamped{
     @GeneratedValue(strategy = GenerationType.IDENTITY) //테이블 값 생성 시, 자동으로 id 증가 = auto increment
     private Long commentId;
 
-    @Column(nullable = false)
-    private Long memoId;
+    /*@Column(name="memo_id",nullable = false)
+    private Long memoId;*/
 
-    @Column(name = "username", nullable = false)
-    private String username;
+    /*@Column(name = "username", nullable = false)
+    private String username;*/
 
     @Column(name = "comments", nullable = false)
     private String comments;
@@ -30,18 +30,19 @@ public class Comment extends Timestamped{
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "memo_id")
+    //@JoinColumn(insertable = false, updatable = false)
+    @JoinColumn(name="memo_id")
     private Memo memo;
 
     public Comment(CommentRequestDto commentRequestDto) {
-        this.memoId = commentRequestDto.getMemoId();
-        this.username = commentRequestDto.getUsername();
+        //this.memoId = commentRequestDto.getMemoId();
+        //this.username = commentRequestDto.getUsername();
         this.comments = commentRequestDto.getComments();
     }
 
     public void update(CommentRequestDto commentRequestDto) {
-        this.memoId = commentRequestDto.getMemoId();
-        this.username = commentRequestDto.getUsername();
+        //this.memoId = commentRequestDto.getMemoId();
+        //this.username = commentRequestDto.getUsername();
         this.comments = commentRequestDto.getComments();
     }
 }

@@ -5,8 +5,8 @@ import com.example.springmemo.dto.MemoResponseDto;
 import com.example.springmemo.entity.Memo;
 import com.example.springmemo.jwt.JwtUtil;
 import com.example.springmemo.repository.MemoRepository;
+import com.example.springmemo.repository.UserRepository;
 import com.example.springmemo.security.UserDetailsImpl;
-import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,10 +20,12 @@ public class MemoService {
         @Service : Persistence Context에 의해 관리받는 Service 클래스라고 지정
      */
     private final MemoRepository memoRepository;
+    private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
 
-    public MemoService(MemoRepository memoRepository, JwtUtil jwtUtil) {
+    public MemoService(MemoRepository memoRepository, UserRepository userRepository, JwtUtil jwtUtil) {
         this.memoRepository = memoRepository;
+        this.userRepository = userRepository;
         this.jwtUtil = jwtUtil;
     }
 
@@ -32,14 +34,18 @@ public class MemoService {
         return memoRepository.findAllByOrderByCreatedAtDesc().stream().map(MemoResponseDto::new).toList();
     }
 
-    public MemoResponseDto getMemo(Long memoid) {
-        return new MemoResponseDto(findMemo(memoid));
+    public MemoResponseDto getMemo(Long memoId) {
+        return new MemoResponseDto(findMemo(memoId));
     }
 
     public MemoResponseDto createMemo(MemoRequestDto memoRequestDto, UserDetailsImpl userDetails) {
         memoRequestDto = updateUsernameToMemoRequestDto(memoRequestDto, userDetails.getUsername());
 
         Memo memo = new Memo(memoRequestDto);
+
+        /* User - jpa 연관관계 설정 */
+        memo.setUser(userDetails.getUser());
+        userRepository.save(userDetails.getUser());
 
         /* memoRepository 변수로 JPA DB 데이터 생성 = save */
         Memo saveMemo = memoRepository.save(memo);
@@ -54,12 +60,12 @@ public class MemoService {
        기존에 패스워드를 검증하는 방법에서 JWT 토큰의 username과 메모에 저장된 username과 비교하여 메모를 수정한다.
      */
     @Transactional
-    public MemoResponseDto updateMemo(Long memoid, MemoRequestDto memoRequestDto, UserDetailsImpl userDetails) {
-        Memo memo = findMemo(memoid);
+    public MemoResponseDto updateMemo(Long memoId, MemoRequestDto memoRequestDto, UserDetailsImpl userDetails) {
+        Memo memo = findMemo(memoId);
         memoRequestDto = updateUsernameToMemoRequestDto(memoRequestDto, userDetails.getUsername());
 
         //jwt Token username과 Memo의 username 비교 검증
-        if (checkUser(memo.getUsername(), memoRequestDto.getUsername()) || userDetails.getAuthoritie().equals("ROLE_ADMIN")) {
+        if (checkUser(memo.getUser().getUsername(), memoRequestDto.getUsername()) || userDetails.getAuthoritie().equals("ROLE_ADMIN")) {
             memo.update(memoRequestDto);
             return new MemoResponseDto(memo);
         } else {
@@ -77,12 +83,12 @@ public class MemoService {
     }
 
     @Transactional
-    public String deleteMemo(Long memoid, UserDetailsImpl userDetails) {
-        Memo memo = findMemo(memoid);
+    public String deleteMemo(Long memoId, UserDetailsImpl userDetails) {
+        Memo memo = findMemo(memoId);
 
         //System.out.println(userDetails.getAuthorities().toArray()[0].equals("ROLE_ADMIN"));
 
-        if (checkUser(memo.getUsername(), userDetails.getUsername()) || userDetails.getAuthoritie().equals("ROLE_ADMIN")) {
+        if (checkUser(memo.getUser().getUsername(), userDetails.getUsername()) || userDetails.getAuthoritie().equals("ROLE_ADMIN")) {
             memoRepository.delete(memo);
             return "{\"msg\":\"게시글 삭제 성공\",\"statusCode\":\"200\"}";
         } else {

@@ -23,8 +23,8 @@ public class Memo extends Timestamped {
     @Column(name = "title", nullable = false)   //테이블 필드 = column
     private String title;
 
-    @Column(name = "username", nullable = false)
-    private String username;
+    /*@Column(name = "username", nullable = false)
+    private String username;*/
 
     @Column(name = "contents", nullable = false)
     private String contents;
@@ -33,18 +33,18 @@ public class Memo extends Timestamped {
     @JoinColumn(name="user_id")
     private User user;
 
-    @OneToMany(mappedBy = "memo")
+    @OneToMany(mappedBy = "memo",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<Comment> commentList = new ArrayList<>();
 
     public Memo(MemoRequestDto memoRequestDto) {
         this.title = memoRequestDto.getTitle();
-        this.username = memoRequestDto.getUsername();
+        //this.username = memoRequestDto.getUsername();
         this.contents = memoRequestDto.getContents();
     }
 
     public void update(MemoRequestDto memoRequestDto) {
         this.title = memoRequestDto.getTitle();
-        this.username = memoRequestDto.getUsername();
+        //this.username = memoRequestDto.getUsername();
         this.contents = memoRequestDto.getContents();
     }
 }
