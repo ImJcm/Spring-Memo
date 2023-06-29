@@ -20,7 +20,7 @@ https://app.gitbook.com/o/65TldPo6hrzFO0fO765W/s/w0bcaUUhyTjUHYfmvN8O/reference/
 ### 댓글 삭제 ###
 #### 쓰레기통 버튼 클릭 시, 현재 접속한 Username과 Comment작성 username을 비교하여 삭제 여부를 결정 ####
 
-### Casecade.ALL & orphanRemoval=true ###
+### Cascade.ALL & orphanRemoval=true ###
 #### 부모 엔티티와 자식 엔티티의 생명주기를 동일하게 설정 ####
 ![6](https://user-images.githubusercontent.com/51190093/249617923-330a0536-57d1-4649-bf48-0f9740d21b95.PNG)
 #### 부모 엔티티 삭제 시, 자식 엔티티 모두 삭제되는 것을 볼 수 있다. ####
