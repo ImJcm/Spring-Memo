@@ -3,6 +3,7 @@ package com.example.springmemo.service;
 import com.example.springmemo.dto.MemoRequestDto;
 import com.example.springmemo.dto.MemoResponseDto;
 import com.example.springmemo.entity.Memo;
+import com.example.springmemo.entity.User;
 import com.example.springmemo.jwt.JwtUtil;
 import com.example.springmemo.repository.MemoRepository;
 import com.example.springmemo.repository.UserRepository;
@@ -38,16 +39,18 @@ public class MemoService {
         return new MemoResponseDto(findMemo(memoId));
     }
 
+    @Transactional
     public MemoResponseDto createMemo(MemoRequestDto memoRequestDto, UserDetailsImpl userDetails) {
         memoRequestDto = updateUsernameToMemoRequestDto(memoRequestDto, userDetails.getUsername());
 
         Memo memo = new Memo(memoRequestDto);
 
-        /* User - jpa 연관관계 설정 */
-        memo.setUser(userDetails.getUser());
-        userRepository.save(userDetails.getUser());
+        //User user = new User(userDetails.getUsername(),userDetails.getPassword(),userDetails.getUser().getRole());
 
-        /* memoRepository 변수로 JPA DB 데이터 생성 = save */
+        /* User, Memo - 영속성 전이 jpa 연관관계 설정 */
+        memo.setUser(userDetails.getUser());
+
+        /* Repository 변수로 JPA DB 데이터 생성 = save */
         Memo saveMemo = memoRepository.save(memo);
 
         /* MemoResponseDto 생성 및 반환 */
@@ -71,15 +74,6 @@ public class MemoService {
         } else {
             throw new IllegalArgumentException("메모의 소유자가 아닙니다.");
         }
-
-        /* 패스워드 검증 */
-        /*if (checkPassword(memo.getPassword(), memoRequestDto.getPassword())) {
-            memo.update(memoRequestDto);
-            return new MemoResponseDto(memo);
-            //return id;
-        } else {
-            throw new IllegalArgumentException("비밀번호가 틀립니다.");
-        }*/
     }
 
     @Transactional
@@ -94,15 +88,6 @@ public class MemoService {
         } else {
             throw new IllegalArgumentException("메모의 소유자가 아닙니다.");
         }
-
-        /* 패스워드 검증 */
-        /*if (checkPassword(memo.getPassword(), password)) {
-            memoRepository.delete(memo);
-            //return id;
-            return "{\"success\":\"true\"}";
-        } else {
-            throw new IllegalArgumentException("비밀번호가 틀립니다.");
-        }*/
     }
 
     private Memo findMemo(Long memoid) {
@@ -120,6 +105,16 @@ public class MemoService {
 
         return memoRequestDto;
     }
+
+
+    /* 패스워드 검증 방법 */
+    /*if (checkPassword(memo.getPassword(), password)) {
+        memoRepository.delete(memo);
+        //return id;
+        return "{\"success\":\"true\"}";
+    } else {
+        throw new IllegalArgumentException("비밀번호가 틀립니다.");
+    }*/
 
     /*private Boolean checkPassword(String fromPassword, String toPassword) {
         return fromPassword.equals(toPassword) ? true : false;

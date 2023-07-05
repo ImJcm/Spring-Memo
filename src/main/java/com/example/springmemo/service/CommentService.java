@@ -40,14 +40,14 @@ public class CommentService {
 
         Comment comment = new Comment(commentRequestDto);
 
-        /* User - JPA 연관관계 설정 */
+        /* User - 영속성 전이 JPA 연관관계 설정 - save 불필요 */
         comment.setUser(userDetails.getUser());
         //userRepository.save(userDetails.getUser());
-        userRepository.save(userRepository.findById(userDetails.getUser().getUserId()).orElse(null));
+        //userRepository.save(userRepository.findById(userDetails.getUser().getUserId()).orElse(null));
 
-        /* Memo - JPA 연관관계 설정 */
+        /* Memo - 영속성 전이 JPA 연관관계 설정 - save 불필요*/
         comment.setMemo(memoRepository.findById(memoId).orElse(null));
-        memoRepository.save(memoRepository.findById(memoId).orElse(null));
+        //memoRepository.save(memoRepository.findById(memoId).orElse(null));
 
         /* commentRepository 변수로 JPA DB 데이터 생성 */
         Comment saveComment = commentRepository.save(comment);
