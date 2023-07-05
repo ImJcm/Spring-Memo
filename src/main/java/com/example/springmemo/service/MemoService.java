@@ -45,12 +45,11 @@ public class MemoService {
 
         Memo memo = new Memo(memoRequestDto);
 
-        //User user = new User(userDetails.getUsername(),userDetails.getPassword(),userDetails.getUser().getRole());
-
-        /* User, Memo - 영속성 전이 jpa 연관관계 설정 */
+        /* User, Memo - 영속성 전이 jpa 연관관계 설정 - save 불필요 */
         memo.setUser(userDetails.getUser());
+        //userRepository.save(userDetails.getUser());
 
-        /* Repository 변수로 JPA DB 데이터 생성 = save */
+        /* Repository 변수로 JPA DB 데이터 생성 */
         Memo saveMemo = memoRepository.save(memo);
 
         /* MemoResponseDto 생성 및 반환 */

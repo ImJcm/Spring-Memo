@@ -45,7 +45,7 @@ public class CommentService {
         //userRepository.save(userDetails.getUser());
         //userRepository.save(userRepository.findById(userDetails.getUser().getUserId()).orElse(null));
 
-        /* Memo - 영속성 전이 JPA 연관관계 설정 - save 불필요*/
+        /* Memo - 영속성 전이 JPA 연관관계 설정 - save 불필요 */
         comment.setMemo(memoRepository.findById(memoId).orElse(null));
         //memoRepository.save(memoRepository.findById(memoId).orElse(null));
 
