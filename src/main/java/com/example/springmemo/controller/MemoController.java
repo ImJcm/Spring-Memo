@@ -1,9 +1,12 @@
 package com.example.springmemo.controller;
 
+import com.example.springmemo.dto.ApiResponseDto;
 import com.example.springmemo.dto.MemoRequestDto;
 import com.example.springmemo.dto.MemoResponseDto;
 import com.example.springmemo.security.UserDetailsImpl;
 import com.example.springmemo.service.MemoService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -78,11 +81,32 @@ public class MemoController {
     public String deleteMemo(@PathVariable Long memoId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         return memoService.deleteMemo(memoId, userDetails);
     }
+
     /*
-    @DeleteMapping("/Memo/{id}")
-    @ResponseBody
-    public String deleteMemo(@PathVariable Long id, @RequestBody Map<String,String> map) {
-        return memoService.deleteMemo(id,map.get("password"));
-    }
+        memoid에 해당하는 게시글에 좋아요 조회
      */
+    @GetMapping("/Memo/{memoId}/likes")
+    public ResponseEntity<ApiResponseDto> getlikesMemo(@PathVariable Long memoId) {
+        return memoService.getlikesMemo(memoId);
+    }
+
+    /*
+        memoid에 해당하는 게시글에 좋아요 등록
+     */
+    @PostMapping("/Memo/{memoId}/like")
+    public ResponseEntity<ApiResponseDto> likeMemo(@PathVariable Long memoId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return memoService.likeMemo(memoId, userDetails);
+    }
+    
+    
+    /*
+    //MemoController의 예외처리 핸들링 - MemoController에서만 적용됨
+    @ExceptionHandler({IllegalArgumentException.class})
+    public ResponseEntity<ApiResponseDto> handleException(IllegalArgumentException ex) {
+        ApiResponseDto apiResponseDto = new ApiResponseDto(HttpStatus.BAD_REQUEST.value(),ex.getMessage(),null);
+        return new ResponseEntity<>(
+                apiResponseDto,
+                HttpStatus.BAD_REQUEST
+        );
+    }*/
 }

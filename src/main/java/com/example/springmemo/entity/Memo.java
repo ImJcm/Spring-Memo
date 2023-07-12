@@ -36,6 +36,9 @@ public class Memo extends Timestamped {
     @OneToMany(mappedBy = "memo",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<Comment> commentList = new ArrayList<>();
 
+    @OneToMany(mappedBy = "memo",cascade = CascadeType.ALL,orphanRemoval = true)
+    private List<LikeMemo> likeMemoList = new ArrayList<>();
+
     public Memo(MemoRequestDto memoRequestDto) {
         this.title = memoRequestDto.getTitle();
         //this.username = memoRequestDto.getUsername();

@@ -13,6 +13,8 @@ public class MemoResponseDto {
     private String contents;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
+    /* 게시글의 좋아요 개수 */
+    private int likes;
     public MemoResponseDto(Memo memo) {
         this.memoId = memo.getMemoId();
         this.title = memo.getTitle();
@@ -21,5 +23,6 @@ public class MemoResponseDto {
         this.contents = memo.getContents();
         this.createdAt = memo.getCreatedAt();
         this.modifiedAt = memo.getModifiedAt();
+        this.likes = memo.getLikeMemoList().size();
     }
 }

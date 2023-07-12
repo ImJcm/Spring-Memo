@@ -1,5 +1,6 @@
 package com.example.springmemo.jwt;
 
+import com.example.springmemo.dto.ApiResponseDto;
 import com.example.springmemo.dto.LoginRequestDto;
 import com.example.springmemo.entity.UserRoleEnum;
 import com.example.springmemo.security.UserDetailsImpl;
@@ -9,6 +10,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -69,4 +72,5 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         log.info("로그인 실패");
         response.setStatus(400);
     }
+
 }

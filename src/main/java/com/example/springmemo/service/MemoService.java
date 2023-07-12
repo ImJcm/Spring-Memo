@@ -1,34 +1,42 @@
 package com.example.springmemo.service;
 
+import com.example.springmemo.dto.ApiResponseDto;
 import com.example.springmemo.dto.MemoRequestDto;
 import com.example.springmemo.dto.MemoResponseDto;
+import com.example.springmemo.dto.LikeMemoResponseDto;
 import com.example.springmemo.entity.Memo;
-import com.example.springmemo.entity.User;
+import com.example.springmemo.entity.LikeMemo;
+import com.example.springmemo.exception.MemoNotFoundException;
+import com.example.springmemo.exception.MemoOwnerNotException;
 import com.example.springmemo.jwt.JwtUtil;
 import com.example.springmemo.repository.MemoRepository;
 import com.example.springmemo.repository.UserRepository;
+import com.example.springmemo.repository.LikeMemoRepository;
 import com.example.springmemo.security.UserDetailsImpl;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSource;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 
 @Service
 @Slf4j(topic = "memo service")
+@RequiredArgsConstructor
 public class MemoService {
     /*
         @Service : Persistence Context에 의해 관리받는 Service 클래스라고 지정
      */
     private final MemoRepository memoRepository;
     private final UserRepository userRepository;
+    private final LikeMemoRepository likeMemoRepository;
+    private final MessageSource messageSource;
     private final JwtUtil jwtUtil;
-
-    public MemoService(MemoRepository memoRepository, UserRepository userRepository, JwtUtil jwtUtil) {
-        this.memoRepository = memoRepository;
-        this.userRepository = userRepository;
-        this.jwtUtil = jwtUtil;
-    }
 
     public List<MemoResponseDto> getMemos() {
         /* 반환 받은 List<Memo>를 반환타입에 맞게 MemoResponseDto(Memo) 생성자를 호출하여 변환 */
@@ -71,7 +79,15 @@ public class MemoService {
             memo.update(memoRequestDto);
             return new MemoResponseDto(memo);
         } else {
-            throw new IllegalArgumentException("메모의 소유자가 아닙니다.");
+            //throw new IllegalArgumentException("메모의 소유자가 아닙니다.");
+            throw new MemoOwnerNotException(
+                    messageSource.getMessage(
+                            "not.owner.Memo",
+                            new Long[]{memoId},
+                            "Not Memo Owner",
+                            Locale.getDefault()
+                    )
+            );
         }
     }
 
@@ -79,19 +95,33 @@ public class MemoService {
     public String deleteMemo(Long memoId, UserDetailsImpl userDetails) {
         Memo memo = findMemo(memoId);
 
-        //System.out.println(userDetails.getAuthorities().toArray()[0].equals("ROLE_ADMIN"));
-
         if (checkUser(memo.getUser().getUsername(), userDetails.getUsername()) || userDetails.getAuthoritie().equals("ROLE_ADMIN")) {
             memoRepository.delete(memo);
             return "{\"msg\":\"게시글 삭제 성공\",\"statusCode\":\"200\"}";
         } else {
-            throw new IllegalArgumentException("메모의 소유자가 아닙니다.");
+            //throw new IllegalArgumentException("메모의 소유자가 아닙니다.");
+            throw new MemoOwnerNotException(
+                    messageSource.getMessage(
+                        "not.owner.Memo",
+                            new Long[]{memoId},
+                            "Not Memo Owner",
+                            Locale.getDefault()
+                    )
+            );
         }
     }
 
-    private Memo findMemo(Long memoid) {
-        return memoRepository.findById(memoid).orElseThrow(() ->
-                new IllegalArgumentException("선택한 메모는 존재하지 않습니다.")
+    private Memo findMemo(Long memoId) {
+        return memoRepository.findById(memoId).orElseThrow(() ->
+                //new IllegalArgumentException("선택한 메모는 존재하지 않습니다.")
+                new MemoNotFoundException(
+                        messageSource.getMessage(
+                                "not.found.Memo",
+                                new Long[]{memoId},
+                                "Not Found Memo",
+                                Locale.getDefault()
+                        )
+                )
         );
     }
 
@@ -105,6 +135,68 @@ public class MemoService {
         return memoRequestDto;
     }
 
+    /*
+        memoId에 해당하는 게시글의 좋아요 전체를 조회
+     */
+    public ResponseEntity<ApiResponseDto> getlikesMemo(Long memoId) {
+        Optional<Memo> memo = memoRepository.findById(memoId);
+
+        if(!memo.isPresent()) {
+            //throw new IllegalArgumentException("해당 게시글이 존재하지 않습니다.");
+            throw new MemoNotFoundException(
+                messageSource.getMessage(
+                    "not.found.Memo",
+                        new Long[]{memoId},
+                        "Not Found Memo",
+                        Locale.getDefault()
+                )
+            );
+        }
+
+        List<LikeMemo> likememolist = likeMemoRepository.findAllByMemo_MemoId(memoId);
+
+        List<LikeMemoResponseDto> newlikememolist = likememolist.stream().map(LikeMemoResponseDto::new).toList();
+
+        return ResponseEntity.status(200).body(new ApiResponseDto(HttpStatus.OK.value(), "게시글 좋아요 조회 성공",newlikememolist));
+    }
+
+    @Transactional
+    public ResponseEntity<ApiResponseDto> likeMemo(Long memoId, UserDetailsImpl userDetails) {
+        Optional<Memo> memo = memoRepository.findById(memoId);
+
+        if(!memo.isPresent()) {
+            //throw new IllegalArgumentException("해당 게시글이 존재하지 않습니다.");
+            throw new MemoNotFoundException(
+                messageSource.getMessage(
+                    "not.found.Memo",
+                        new Long[]{memoId},
+                        "Not Found Memo",
+                        Locale.getDefault()
+                )
+            );
+        }
+
+        Optional<LikeMemo> likeMemo = likeMemoRepository.findByMemo_MemoIdAndUser_UserId(memoId,userDetails.getUser().getUserId());
+
+        /* 해당 게시글에 좋아요가 없는 경우 or 있는 경우*/
+        if(!likeMemo.isPresent()) {
+            LikeMemo newlikeMemo = new LikeMemo();
+
+            /* JPA 연관관계 - Memo - likeMemo */
+            newlikeMemo.setMemo(memo.get());
+
+            /* JPA 연관관계 - User - likeMemo */
+            newlikeMemo.setUser(userDetails.getUser());
+
+            /* 영속성 전이 */
+            likeMemoRepository.save(newlikeMemo);
+
+            return ResponseEntity.status(200).body(new ApiResponseDto(HttpStatus.OK.value(), "게시글 좋아요 성공",null));
+        } else {
+            likeMemoRepository.delete(likeMemo.get());
+            return ResponseEntity.status(200).body(new ApiResponseDto(HttpStatus.OK.value(), "게시글 좋아요 취소 성공",null));
+        }
+    }
 
     /* 패스워드 검증 방법 */
     /*if (checkPassword(memo.getPassword(), password)) {

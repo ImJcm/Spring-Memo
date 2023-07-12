@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -33,6 +36,9 @@ public class Comment extends Timestamped{
     //@JoinColumn(insertable = false, updatable = false)
     @JoinColumn(name="memo_id")
     private Memo memo;
+
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL,orphanRemoval = true)
+    private List<LikeComment> likeCommentList = new ArrayList<>();
 
     public Comment(CommentRequestDto commentRequestDto) {
         //this.memoId = commentRequestDto.getMemoId();

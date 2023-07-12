@@ -1,9 +1,11 @@
 package com.example.springmemo.controller;
 
+import com.example.springmemo.dto.ApiResponseDto;
 import com.example.springmemo.dto.CommentRequestDto;
 import com.example.springmemo.dto.CommentResponseDto;
 import com.example.springmemo.security.UserDetailsImpl;
 import com.example.springmemo.service.CommentService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,4 +40,13 @@ public class CommentController {
         return commentService.deleteComment(memoId, commentId, userDetails);
     }
 
+    @GetMapping("/Comment/{commentId}/likes")
+    public ResponseEntity<ApiResponseDto> getlikesComment(@PathVariable Long commentId) {
+        return commentService.getlikescomment(commentId);
+    }
+
+    @PostMapping("/Comment/{commentId}/like")
+    public ResponseEntity<ApiResponseDto> likeComment(@PathVariable Long commentId, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return commentService.likeComment(commentId,userDetails);
+    }
 }
