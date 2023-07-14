@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -19,6 +20,9 @@ public class CommentResponseDto {
     private LocalDateTime modifiedAt;
     /* 댓글의 좋아요 개수 */
     private int likes;
+
+    /* 댓글의 좋아요 내역 */
+    private List<LikeCommentResponseDto> likeCommentList;
     /*
         또는 responseDto에 String username, Long memoId가 아닌
         Memo, User 객체를 반환하여 client 측에서 변환하여 사용해도 됨
@@ -31,5 +35,6 @@ public class CommentResponseDto {
         this.createdAt = comment.getCreatedAt();
         this.modifiedAt = comment.getModifiedAt();
         this.likes = comment.getLikeCommentList().size();
+        this.likeCommentList = comment.getLikeCommentList().stream().map(LikeCommentResponseDto::new).toList();
     }
 }

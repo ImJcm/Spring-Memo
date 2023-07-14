@@ -1,6 +1,7 @@
 package com.example.springmemo.controller;
 
 import com.example.springmemo.dto.SignupRequestDto;
+import com.example.springmemo.exception.SignupValidationException;
 import com.example.springmemo.service.UserService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +12,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 //@Slf4j : spring logger, logging에 사용될 프레임워크
 @Slf4j
@@ -38,23 +41,28 @@ public class UserController {
     @PostMapping("/user/signup")
     public String signup(@Valid SignupRequestDto requestDto, BindingResult bindingResult) {
         // Validation 예외처리 - username, password의 양식(format) 검사
-        List<FieldError> fieldErrors = bindingResult.getFieldErrors();
-        if(fieldErrors.size() > 0) {
-            for (FieldError fieldError : bindingResult.getFieldErrors()) {
-                log.error(fieldError.getField() + " 필드 : " + fieldError.getDefaultMessage());
+        if(bindingResult.hasErrors()) {
+            List<FieldError> fieldErrors = bindingResult.getFieldErrors();
+            Map<String,String> errorMap = new HashMap<>();  //error 담기위한 객체
+            for (FieldError error : fieldErrors) {
+                log.error(error.getField() + " 필드 : " + error.getDefaultMessage());
+                errorMap.put(error.getField(), error.getDefaultMessage());
             }
-            return "redirect:/api/user/signup";
+            throw new SignupValidationException("회원가입 유효성 검사 실패",errorMap);
+            //return "redirect:/api/user/signup";
         }
 
-        try {
+        userService.signup(requestDto);
+
+        /*try {
             userService.signup(requestDto);
-        } catch (IllegalArgumentException e) {
+        } //catch (IllegalArgumentException e) {
             //@ResponseBody를 붙일 수 없기때문에 불가능
             //return "{\"msg\":\"아이디가 중복됩니다.\"}";
             //중복 아이디일 경우 회원가입 창 redirect
             log.error(e.getMessage());
-            return "redirect:/api/user/signup";
-        }
+            //return "redirect:/api/user/signup";
+        }*/
 
         //회원가입 성공 response
         return "redirect:/api/user/login-page";

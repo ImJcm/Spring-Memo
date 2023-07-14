@@ -1,12 +1,17 @@
 package com.example.springmemo.jwt;
 
+import com.example.springmemo.exception.AdminTokenWrongException;
+import com.example.springmemo.exception.LoginFailException;
 import com.example.springmemo.security.UserDetailsServiceImpl;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -16,6 +21,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j(topic = "JWT 검증 및 인가")
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
@@ -29,29 +36,26 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     /*
         request Header로부터 cookie에서 AUTHENTICATION_HEADER에 해당하는 cookie를 모두 받아온 뒤,
-
      */
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain filterChain) throws ServletException, IOException {
         String tokenValue = jwtUtil.getTokenFromRequest(req);
 
-        //문자열 유효성 검사 : null이 아니고, 길이가 0보다 크고, 공백이 아닌문자열인지 검사
+        //Token 문자열 검사 : null이 아니고, 길이가 0보다 크고, 공백이 아닌문자열인지 검사
         if (StringUtils.hasText(tokenValue)) {
             // JWT 토큰 substring
             tokenValue = jwtUtil.substringToken(tokenValue);
             log.info(tokenValue);
 
-            //Token 오류의 에러처리를 하려면 jwtUtil.validateToken()에서 어떤 오류인지를 식별하고 상태값을 반환한 뒤,
-            //아래에서 상태값을 바탕으로 response.setStatus()로 상태코드를 보내면 상태코드 별로 트리거를 수행하면 될 것같다.
-            //프론트에서 트리거를 실행할 경우, 상태코드에 따라 api 요청이 달라질 것이고, 서버에서 처리 시, redirect:url로
-            //문제가 발생한 부분을 재요청할 것같다.
-            //JWT 토큰의 유효성 검사
+            /*
+                Token 오류의 에러처리를 하려면 jwtUtil.validateToken()에서 어떤 오류인지를 식별하고 상태값을 반환한 뒤,
+                아래에서 상태값을 바탕으로 response.setStatus()로 상태코드를 보내면 상태코드 별로 트리거를 수행하면 될 것같다.
+                프론트에서 트리거를 실행할 경우, 상태코드에 따라 api 요청이 달라질 것이고, 서버에서 처리 시, redirect:url로
+                문제가 발생한 부분을 재요청할 것같다.
+                JWT 토큰의 유효성 검사
+            */
             if (!jwtUtil.validateToken(tokenValue)) {
-                //log.error("Token Error");
-
-                res.setStatus(400);
-                //res.sendError(400,"토큰이 유효하지않습니다.");
-                //res.sendError(HttpServletResponse.SC_BAD_REQUEST,"토큰이 유효하지 않습니다.");
+                //res.sendError(400, "토큰이 유효하지 않습니다.");
                 return;
             }
 
@@ -65,7 +69,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 return;
             }
         }
-
         filterChain.doFilter(req, res);
     }
 

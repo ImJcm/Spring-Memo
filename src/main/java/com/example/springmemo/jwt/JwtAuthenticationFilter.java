@@ -3,6 +3,7 @@ package com.example.springmemo.jwt;
 import com.example.springmemo.dto.ApiResponseDto;
 import com.example.springmemo.dto.LoginRequestDto;
 import com.example.springmemo.entity.UserRoleEnum;
+import com.example.springmemo.exception.LoginFailException;
 import com.example.springmemo.security.UserDetailsImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
@@ -11,6 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -18,6 +20,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /*
     Spring에서 제공하는 Spring Security Filter 중 UsernamePasswordAuthenticationFilter를 상속받아서
@@ -42,6 +46,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         try {
             LoginRequestDto requestDto = new ObjectMapper().readValue(req.getInputStream(), LoginRequestDto.class);
 
+            /*
+                ProviderManager의 authenticate(UsernamePasswordAuthenticationToken()) 수행
+                아래 과정에서 ProviderManager가 AuthenticationProvider를 찾아서 인증하는 과정또한 포함
+             */
             return getAuthenticationManager().authenticate(
                     new UsernamePasswordAuthenticationToken(
                             requestDto.getUsername(),
@@ -54,7 +62,13 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             throw new RuntimeException(e.getMessage());
         }
     }
-    
+
+    /*
+        인증 성공, 실패 Handling
+        성공 : successfulAuthentication
+        실패 : unsuccessfulAuthentication
+     */
+
     //authentication 성공 시, jwtUtil을 통해 username과 role값으로 token을 생성하고 클라이언트에게 token을 생성한다.
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
@@ -66,11 +80,19 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         jwtUtil.addJwtToCookie(token, response);
     }
 
-    //인증 실패 시, responseStatus : 400로 지정 후, 종료
+    //인증 실패 시, responseStatus : 400로 지정 후, 종료 - 실패 핸들링
     @Override
-    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
+    protected void unsuccessfulAuthentication(HttpServletRequest req, HttpServletResponse res, AuthenticationException failed) throws IOException, ServletException {
         log.info("로그인 실패");
-        response.setStatus(400);
-    }
 
+        res.setContentType(MediaType.APPLICATION_JSON_VALUE);
+
+        final Map<String, Object> body = new HashMap<>();
+        body.put("status", HttpServletResponse.SC_BAD_REQUEST);
+        body.put("message", "회원을 찾을 수 없습니다.");
+
+        final ObjectMapper mapper = new ObjectMapper();
+        res.setStatus(400);
+        mapper.writeValue(res.getOutputStream(), body);
+    }
 }

@@ -4,7 +4,7 @@ import com.example.springmemo.dto.SignupRequestDto;
 import com.example.springmemo.entity.User;
 import com.example.springmemo.entity.UserRoleEnum;
 import com.example.springmemo.exception.AdminTokenWrongException;
-import com.example.springmemo.exception.UserNotFoundException;
+import com.example.springmemo.exception.DuplicateUsernameException;
 import com.example.springmemo.jwt.JwtUtil;
 import com.example.springmemo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -42,19 +42,25 @@ public class UserService {
     public void signup(SignupRequestDto requestDto) {   //@ModelAttribute가 생략된 것으로 보인다.
         String username = requestDto.getUsername();
         String password = passwordEncoder.encode(requestDto.getPassword());
+        String adminToken = requestDto.getAdminToken();
 
         // 회원 중복 확인
         Optional<User> checkUsername = userRepository.findByUsername(username);
         if (checkUsername.isPresent()) {
             //throw new IllegalArgumentException("중복된 사용자가 존재합니다.");
-            throw new UserNotFoundException(
+            throw new DuplicateUsernameException(
                 messageSource.getMessage(
-                    "not.found.User",
+                    "duplicate.user",
                         null,
-                        "Not Found User",
+                        "Duplicate User",
                         Locale.getDefault()
                 )
             );
+        }
+
+        //Role Admin check
+        if(checkAdmin(adminToken)) {
+            requestDto.setAdmin(true);
         }
 
         // 사용자 ROLE 확인
@@ -77,5 +83,12 @@ public class UserService {
         // 사용자 등록
         User user = new User(username, password, role);
         userRepository.save(user);
+    }
+
+    private boolean checkAdmin(String adminToken) {
+        if(adminToken.equals(ADMIN_TOKEN)){
+            return true;
+        }
+        return false;
     }
 }

@@ -2,6 +2,7 @@ package com.example.springmemo.config;
 
 import com.example.springmemo.jwt.JwtAuthenticationFilter;
 import com.example.springmemo.jwt.JwtAuthorizationFilter;
+import com.example.springmemo.jwt.JwtExceptionFilter;
 import com.example.springmemo.jwt.JwtUtil;
 import com.example.springmemo.security.UserDetailsServiceImpl;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -30,7 +31,6 @@ public class WebSecurityConfig {
     //Spring security에서 제공하는 UserDetails를 상속받는 UserDetailsImpl객체를 이용을 위한 변수
     private final UserDetailsServiceImpl userDetailsService;
     private final AuthenticationConfiguration authenticationConfiguration;  //Authentication 환경 설정변수
-
 
     //Bean 객체를 등록
     public WebSecurityConfig(JwtUtil jwtUtil, UserDetailsServiceImpl userDetailsService, AuthenticationConfiguration authenticationConfiguration) {
@@ -61,6 +61,11 @@ public class WebSecurityConfig {
         return new JwtAuthorizationFilter(jwtUtil, userDetailsService);
     }
 
+    @Bean
+    public JwtExceptionFilter jwtExceptionFilter() {
+        return new JwtExceptionFilter();
+    }
+
     //
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -83,7 +88,6 @@ public class WebSecurityConfig {
                     .anyRequest().authenticated();  // 그 외 모든 요청 인증 과정 거침
         });
 
-
         //spring security에서 제공하는 Login에 사용될 view 페이지 설정
         http.formLogin((formLogin) ->
                 formLogin
@@ -92,10 +96,13 @@ public class WebSecurityConfig {
 
         // 필터 관리
         // 인증 이전에 인가를 배치하여 JWT 토큰이 있다면 인가부분에서 인증 처리한다.
-        // JwtAuthorizationFilter -> JwtAuthenticationFilter -> UsernamePasswordAuthenticationFilter
+        // JwtExceptionFilter -> JwtAuthorizationFilter -> JwtAuthenticationFilter -> UsernamePasswordAuthenticationFilter
         // -> DispatcherServlet -> Controller -> ...
-        http.addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);
+
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);
+        http.addFilterBefore(jwtExceptionFilter(), JwtAuthorizationFilter.class);
+
 
         return http.build();
 
